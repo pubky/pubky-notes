@@ -1,53 +1,82 @@
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/tauri";
+import { PubkyClient, Keypair, PublicKey } from "@synonymdev/pubky";
+import { Buffer } from "buffer";
+
 import "./App.css";
 
-function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+const HOMESERVER = "8pinxxgqs41n4aididenw5apqp1urfmzdztr8jt4abrkdn435ewo";
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    setGreetMsg(await invoke("greet", { name }));
+const decoder = new TextDecoder();
+
+const App = () => {
+  const [inputValue, setInputValue] = useState("");
+  const [note, setNote] = useState("");
+
+  async function create() {
+    // Initialize PubkyClient with Pkarr relay(s).
+    const client = PubkyClient.testnet();
+    console.log({ client });
+
+    // Generate a keypair
+    const keypair = Keypair.random();
+    console.log({ keypair });
+
+    // Create a new account
+    const homeserver = PublicKey.from(HOMESERVER);
+    console.log({ homeserver });
+
+    const response = await client.signup(keypair, homeserver);
+    console.log({ response });
+
+    const publicKey = keypair.publicKey();
+    console.log({ publicKey });
+
+    // Pubky URL
+    const url = `pubky://${publicKey.z32()}/pub/example.com/arbitrary`;
+    // Verify that you are signed in.
+    const session = await client.session(publicKey);
+    const body = Buffer.from(JSON.stringify({ foo: inputValue }));
+
+    // PUT public data, by authorized client
+    await client.put(url, body);
+
+    // GET public data
+    const buffer = await client.get(url);
+    console.log({ buffer });
+
+    if (buffer) {
+      const json = decoder.decode(buffer);
+      const note = JSON.parse(json);
+      console.log({ note });
+
+      setNote(note.foo);
+    }
   }
 
   return (
     <div className="container">
-      <h1>Welcome to Tauri!</h1>
+      <h1>Pubky Notes</h1>
 
-      <div className="row">
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
+      <p>Write a note and save it to the server.</p>
 
       <form
         className="row"
         onSubmit={(e) => {
           e.preventDefault();
-          greet();
+          create();
         }}
       >
         <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
+          id="note-input"
+          onChange={(e) => setInputValue(e.currentTarget.value)}
+          placeholder="Write a note..."
         />
-        <button type="submit">Greet</button>
+        <button type="submit">Save</button>
       </form>
 
-      <p>{greetMsg}</p>
+      <p>{note}</p>
     </div>
   );
-}
+};
 
 export default App;
