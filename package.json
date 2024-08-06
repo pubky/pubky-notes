@@ -5,16 +5,20 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "tsc:check": "tsc --noEmit",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri"
   },
   "dependencies": {
-    "@synonymdev/pubky": "^0.1.8",
+    "@markdoc/markdoc": "^0.4.0",
+    "@synonymdev/pubky": "^0.1.12",
     "@tauri-apps/api": "^1",
     "buffer": "^6.0.3",
+    "jotai": "^2.9.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "styled-components": "^6.1.12"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1",
@@ -23,5 +27,8 @@
     "@vitejs/plugin-react": "^4.2.1",
     "typescript": "^5.2.2",
     "vite": "^5.3.1"
+  },
+  "resolutions": {
+    "styled-components": "^5"
   }
 }
