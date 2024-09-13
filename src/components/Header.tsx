@@ -28,9 +28,9 @@ const Header = () => {
 
   return (
     <Container>
-      <Title>Pubky Notes</Title>
+      <Title onClick={() => location.assign("/")}>Pubky Notes</Title>
       <Actions>
-        {secretKey && <button onClick={onLogout}>Logout</button>}
+        {secretKey && <Button onClick={onLogout}>Logout</Button>}
       </Actions>
     </Container>
   );
@@ -40,12 +40,13 @@ const Container = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: rgba(238, 113, 255, 0.42);
+  background-color: rgba(0, 0, 0, 0.42);
   min-height: 40px;
   padding: 8px 16px;
 `;
 
 const Title = styled.h1`
+  cursor: pointer;
   font-size: 1.5rem;
   margin: 0;
 `;
@@ -55,6 +56,10 @@ const Actions = styled.div`
   justify-content: space-between;
   align-items: center;
   gap: 8px;
+`;
+
+const Button = styled.button`
+  border: 1px solid #ffffff;
 `;
 
 export default Header;

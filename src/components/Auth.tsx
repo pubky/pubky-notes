@@ -1,4 +1,4 @@
-import { useEffect, ReactNode, useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Keypair, PublicKey } from "@synonymdev/pubky";
 import { useAtom, useAtomValue } from "jotai";
@@ -6,9 +6,10 @@ import { Buffer } from "buffer";
 
 import { DOMAIN, HOMESERVER, pubkyClient } from "~/constants";
 import { pubkyUrlAtom, secretKeyAtom } from "~/atoms";
+import Main from "~/components/Main";
 import Login from "~/components/Login";
 
-const Auth = ({ children }: { children: ReactNode }): ReactNode => {
+const Auth = () => {
   const [url, setUrl] = useAtom(pubkyUrlAtom);
   const secretKey = useAtomValue(secretKeyAtom);
   const [isLoading, setIsLoading] = useState(true);
@@ -43,7 +44,7 @@ const Auth = ({ children }: { children: ReactNode }): ReactNode => {
     return <Loading />;
   }
 
-  return loggedIn ? children : <Login />;
+  return loggedIn ? <Main /> : <Login />;
 };
 
 const Loading = styled.div`

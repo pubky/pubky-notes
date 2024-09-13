@@ -11,6 +11,7 @@ export const secretKeyAtom = atomWithStorage<string | undefined>(
 );
 
 export const pubkyUrlAtom = atom("");
+export const syncingAtom = atom(false);
 
 export type TNote = {
   id: string;

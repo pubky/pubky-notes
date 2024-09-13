@@ -1,11 +1,9 @@
 import styled from "styled-components";
+import { Toaster } from "react-hot-toast";
 
 import GlobalStyle from "~/styles/global";
 import Header from "~/components/Header";
-import Auth from "~/components/Auth";
-import Main from "~/components/Main";
-import Sidebar from "~/components/Sidebar";
-import Note from "~/components/Note";
+import AppRouter from "./components/AppRouter";
 
 const App = () => {
   return (
@@ -13,13 +11,15 @@ const App = () => {
       <GlobalStyle />
       <AppContainer>
         <Header />
-        <Auth>
-          <Main>
-            <Sidebar />
-            <Note />
-          </Main>
-        </Auth>
+        <AppRouter />
       </AppContainer>
+      <Toaster
+        position="bottom-right"
+        toastOptions={{
+          duration: 5000,
+          style: { padding: "4px 8px" },
+        }}
+      />
     </>
   );
 };

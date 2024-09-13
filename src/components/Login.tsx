@@ -31,7 +31,7 @@ const Login = () => {
 
   return (
     <Container>
-      <Title>Pubky Notes</Title>
+      <Title>Welcome</Title>
       <Text>Enter your private key to login</Text>
       <Form onSubmit={onSubmit}>
         <TextField type="text" name="secretKey" placeholder="Private Key" />
@@ -39,7 +39,7 @@ const Login = () => {
       </Form>
       <Divider />
       <Text>Or signup with a new account</Text>
-      <button onClick={onSignup}>New Account</button>
+      <button onClick={onSignup}>Create Account</button>
     </Container>
   );
 };
@@ -56,6 +56,7 @@ const Container = styled.div`
 const Title = styled.h1`
   font-size: 1.5rem;
   margin-top: 0;
+  margin-bottom: 8px;
 `;
 
 const Text = styled.p`

@@ -2,11 +2,17 @@ import React, { useEffect, useState } from "react";
 import Markdoc, { RenderableTreeNode } from "@markdoc/markdoc";
 import styled from "styled-components";
 import { Buffer } from "buffer";
+import toast from "react-hot-toast";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 
 import { useDebounce } from "~/hooks";
-import { notesAtom, pubkyUrlAtom, selectedNoteAtom } from "~/atoms";
 import { pubkyClient } from "~/constants/index";
+import {
+  notesAtom,
+  pubkyUrlAtom,
+  selectedNoteAtom,
+  syncingAtom,
+} from "~/atoms";
 
 const SYNC_INTERVAL = 3000;
 
@@ -14,7 +20,7 @@ const Note = () => {
   const url = useAtomValue(pubkyUrlAtom);
   const setNotes = useSetAtom(notesAtom);
   const [note, setNote] = useAtom(selectedNoteAtom);
-  const [needsSync, setNeedsSync] = useState(false);
+  const [isSyncing, setIsSyncing] = useAtom(syncingAtom);
   const [showPreview, setShowPreview] = useState(false);
   const [markdown, setMarkdown] = useState<RenderableTreeNode>();
   const debouncedNote = useDebounce(note.content, SYNC_INTERVAL);
@@ -24,10 +30,10 @@ const Note = () => {
       const body = Buffer.from(JSON.stringify(note));
       await pubkyClient!.put(`${url}/notes/${note.id}`, body);
 
-      setNeedsSync(false);
+      setIsSyncing(false);
     };
 
-    if (!needsSync) {
+    if (!isSyncing) {
       return;
     }
 
@@ -40,7 +46,7 @@ const Note = () => {
   }, [note]);
 
   const onChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setNeedsSync(true);
+    setIsSyncing(true);
     const editedNote = { id: note.id, content: event.target.value };
     setNote(editedNote);
     setNotes((prev) => {
@@ -56,14 +62,18 @@ const Note = () => {
     setShowPreview((prev) => !prev);
   };
 
-  // const onShare = () => {};
+  const onShare = () => {
+    const shareUrl = `${window.location.origin}/preview?url=${url}/notes/${note.id}`;
+    navigator.clipboard.writeText(shareUrl);
+    toast.success("Copied public URL to clipboard");
+  };
 
   return (
     <Container>
       <Actions>
-        <SyncedIndicator $synced={!needsSync}>Synced ✔</SyncedIndicator>
+        <SyncedIndicator $synced={!isSyncing}>Synced ✔</SyncedIndicator>
         <button onClick={onPreview}>{showPreview ? "Edit" : "Preview"}</button>
-        {/* <button onClick={onShare}>Share</button> */}
+        <button onClick={onShare}>Share</button>
       </Actions>
 
       {!showPreview && (

@@ -1,78 +1,89 @@
-import { ReactNode, useCallback, useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import styled from "styled-components";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useAtomCallback } from "jotai/utils";
 
-import { notesAtom, pubkyUrlAtom } from "~/atoms";
-import decoder from "~/utils/textdecoder";
 import { pubkyClient } from "~/constants/index";
+import decoder from "~/utils/textdecoder";
+import Sidebar from "~/components/Sidebar";
+import Note from "~/components/Note";
+import {
+  notesAtom,
+  pubkyUrlAtom,
+  selectedNoteAtom,
+  syncingAtom,
+} from "~/atoms";
 
 const POLLING_INTERVAL = 5000;
 
-const Main = ({ children }: { children: ReactNode }) => {
+const Main = () => {
   const url = useAtomValue(pubkyUrlAtom);
+  const isSyncing = useAtomValue(syncingAtom);
+  const [selectedNote, setSelectedNote] = useAtom(selectedNoteAtom);
   const setNotes = useSetAtom(notesAtom);
 
   const getCurrentNotes = useAtomCallback(
     useCallback((get) => get(notesAtom), [])
   );
 
-  useEffect(() => {
-    const syncRemote = async () => {
-      const list = await pubkyClient!.list(url);
+  const syncRemote = useCallback(async () => {
+    if (isSyncing) {
+      return;
+    }
 
-      if (list.length > 0) {
-        const promises = list.map(async (url: string) => {
-          return await pubkyClient!.get(url);
+    const list = await pubkyClient!.list(url);
+
+    if (list.length > 0) {
+      const promises = list.map(async (url: string) => {
+        return await pubkyClient!.get(url);
+      });
+
+      const noteBuffers = await Promise.all(promises);
+      const remoteNotes = noteBuffers.map((noteBuffer) => {
+        const json = decoder.decode(noteBuffer);
+        return JSON.parse(json);
+      });
+
+      const currentNotes = getCurrentNotes();
+
+      // Update notes if there are changes
+      if (JSON.stringify(currentNotes) !== JSON.stringify(remoteNotes)) {
+        console.log("notes have changed");
+
+        // Update all notes
+        setNotes(remoteNotes);
+
+        // Update the currently selected note
+        const selected = remoteNotes.find((note) => {
+          return note.id === selectedNote.id;
         });
 
-        const noteBuffers = await Promise.all(promises);
-        const remoteNotes = noteBuffers.map((noteBuffer) => {
-          const json = decoder.decode(noteBuffer);
-          return JSON.parse(json);
-        });
-
-        const currentNotes = getCurrentNotes();
-
-        // Update notes if there are changes
-        if (JSON.stringify(currentNotes) !== JSON.stringify(remoteNotes)) {
-          console.log("notes have changed");
-
-          // If there are no notes, set the remote notes
-          if (currentNotes.length === 0) {
-            setNotes(remoteNotes);
-            return;
-          }
-
-          const localIds = currentNotes.map((note) => note.id);
-          const remoteIds = remoteNotes.map((note) => note.id);
-
-          const newNotes = remoteNotes.filter((note) => {
-            return !localIds.includes(note.id);
-          });
-          const updatedNotes = remoteNotes.filter((note) => {
-            return localIds.includes(note.id);
-          });
-
-          const mergedNotes = currentNotes
-            .filter((note) => !remoteIds.includes(note.id))
-            .concat(newNotes)
-            .concat(updatedNotes);
-
-          setNotes(mergedNotes);
-        } else {
-          console.log("notes are the same");
+        if (selected) {
+          setSelectedNote(selected);
         }
+      } else {
+        console.log("notes are the same");
       }
-    };
+    }
+  }, [isSyncing]);
 
+  // Initial sync
+  useEffect(() => {
     syncRemote();
-    const interval = setInterval(syncRemote, POLLING_INTERVAL);
-
-    return () => clearInterval(interval);
   }, [url]);
 
-  return <Container>{children}</Container>;
+  // Polling
+  useEffect(() => {
+    const interval = setInterval(syncRemote, POLLING_INTERVAL);
+    return () => clearInterval(interval);
+  }, [url, syncRemote]);
+
+  return (
+    <Container>
+      <Sidebar />
+      <Note />
+    </Container>
+  );
 };
 
 const Container = styled.div`

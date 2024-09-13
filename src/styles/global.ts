@@ -88,8 +88,8 @@ const GlobalStyle = createGlobalStyle`
 
     input,
     button {
-      color: #ffffff;
       background-color: #0f0f0f98;
+      color: #ffffff;
     }
     button:active {
       background-color: #0f0f0f69;
