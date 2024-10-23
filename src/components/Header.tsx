@@ -1,6 +1,7 @@
 import { useAtom, useSetAtom } from "jotai";
 import { RESET } from "jotai/utils";
 import styled from "styled-components";
+import toast from "react-hot-toast";
 
 import {
   notesAtom,
@@ -14,6 +15,11 @@ const Header = () => {
   const setUrl = useSetAtom(pubkyUrlAtom);
   const setNotes = useSetAtom(notesAtom);
   const setSelectedNote = useSetAtom(selectedNoteAtom);
+
+  const onCopyKey = () => {
+    navigator.clipboard.writeText(String(secretKey));
+    toast.success("Copied secret key to clipboard");
+  };
 
   const onLogout = () => {
     // Clear all the atoms
@@ -30,6 +36,7 @@ const Header = () => {
     <Container>
       <Title onClick={() => location.assign("/")}>Pubky Notes</Title>
       <Actions>
+        {secretKey && <Button onClick={onCopyKey}>Copy Private Key</Button>}
         {secretKey && <Button onClick={onLogout}>Logout</Button>}
       </Actions>
     </Container>
