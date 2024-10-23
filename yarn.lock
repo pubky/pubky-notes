@@ -473,10 +473,10 @@
   resolved "https://registry.yarnpkg.com/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.19.2.tgz#d67206c5f2e4b2832ce360bbbde194e96d16dc51"
   integrity sha512-DPi0ubYhSow/00YqmG1jWm3qt1F8aXziHc/UNy8bo9cpCacqhuWu+iSq/fp2SyEQK7iYTZ60fBU9cat3MXTjIQ==
 
-"@synonymdev/pubky@^0.1.12":
-  version "0.1.12"
-  resolved "https://registry.yarnpkg.com/@synonymdev/pubky/-/pubky-0.1.12.tgz#71cb1dcfcbedebbf790186929184161ad9deb1fa"
-  integrity sha512-1VGIBlFTlc5gxi6Geug4zNnlQrAFHGOCZewc+oAa/qeiL+rwnnRNLzLBvI6bjfMH1TNkr3CwkFlRsGVCH6bcSw==
+"@synonymdev/pubky@0.1.16":
+  version "0.1.16"
+  resolved "https://registry.yarnpkg.com/@synonymdev/pubky/-/pubky-0.1.16.tgz#96527288e71a0460f6baaf2e61bb1d306012d31a"
+  integrity sha512-jtFahEUUDfrTE7vpZx6m/uB4wMEBoqpEtuUoWCf30HH8cmm0Hfrv8v0xmwaSwPfSdcZlIG8beE5XjbX+eLmLUA==
 
 "@tauri-apps/api@^1":
   version "1.6.0"
